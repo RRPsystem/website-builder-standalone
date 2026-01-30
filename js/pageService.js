@@ -84,7 +84,7 @@
       throw new Error('Je moet ingelogd zijn');
     }
 
-    const response = await fetch(`${API_BASE}/api/pages/${id}`, {
+    const response = await fetch(`${API_BASE}/api/standalone-pages/get?id=${id}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -106,7 +106,7 @@
       throw new Error('Je moet ingelogd zijn');
     }
 
-    const response = await fetch(`${API_BASE}/api/pages/${id}`, {
+    const response = await fetch(`${API_BASE}/api/standalone-pages/delete?id=${id}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`
