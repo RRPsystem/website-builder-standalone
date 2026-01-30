@@ -298,36 +298,48 @@
     
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
+      // Always setup tabs and forms first so UI is interactive
+      setupTabs();
+      setupForms();
+      
       // Try to get config from API
       try {
+        console.log('[Login] Fetching config...');
         const res = await fetch('/api/config');
         if (res.ok) {
           const config = await res.json();
+          console.log('[Login] Config received:', config.SUPABASE_ANON_KEY ? 'Key present' : 'No key');
           if (config.SUPABASE_ANON_KEY) {
             window.STANDALONE_SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
           }
+        } else {
+          console.warn('[Login] Config fetch failed:', res.status);
         }
       } catch (e) {
-        console.warn('Could not fetch config:', e);
+        console.warn('[Login] Could not fetch config:', e);
       }
       
       const anonKey = window.STANDALONE_SUPABASE_ANON_KEY;
       if (anonKey) {
-        supabase = window.supabase.createClient(SUPABASE_URL, anonKey);
-        
-        // Check if already logged in
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          // Redirect to builder
-          window.location.href = 'builder.html';
-          return;
+        try {
+          supabase = window.supabase.createClient(SUPABASE_URL, anonKey);
+          console.log('[Login] Supabase client created');
+          
+          // Check if already logged in
+          const { data: { session } } = await supabase.auth.getSession();
+          if (session) {
+            console.log('[Login] Already logged in, redirecting...');
+            window.location.href = 'builder.html';
+            return;
+          }
+        } catch (e) {
+          console.error('[Login] Supabase init error:', e);
+          showError('Fout bij initialiseren. Check console voor details.');
         }
       } else {
-        showError('Configuratie niet geladen. Probeer de pagina te verversen.');
+        console.warn('[Login] No SUPABASE_ANON_KEY found');
+        showError('Configuratie niet geladen. Voeg SUPABASE_ANON_KEY toe aan Vercel environment variables.');
       }
-      
-      setupTabs();
-      setupForms();
     });
     
     function setupTabs() {
