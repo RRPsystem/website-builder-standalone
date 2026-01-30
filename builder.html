@@ -104,55 +104,36 @@
                 </h1>
             </div>
             <div class="header-right">
-                <!-- Simplified menu for standalone version -->
-                <a href="index.html" class="btn btn-secondary" style="margin-right:8px;" title="Terug naar startscherm">
-                    <i class="fas fa-home"></i>
+                <!-- Simplified standalone menu -->
+                <a href="index.html" class="btn btn-secondary" style="margin-right:16px;" title="Terug naar startscherm">
+                    <i class="fas fa-home"></i> Home
                 </a>
-                <select id="buildTypeSelect" class="form-control" style="height:36px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:white;color:#1f2937;font-weight:600;font-size:14px;cursor:pointer;margin-right:16px;">
-                    <option value="travel">✈️ Reis Importeren</option>
-                    <option value="page">📄 Website Bouwen</option>
+                
+                <!-- Hidden elements for compatibility -->
+                <select id="buildTypeSelect" style="display:none;">
+                    <option value="travel">Reis Importeren</option>
+                    <option value="page">Website Bouwen</option>
                 </select>
-                <div class="page-meta" id="pageMetaSection" style="display:none;flex-direction:column;gap:4px;margin-right:16px;">
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <label for="pageTitleInput" style="color:#f8fafc;font-size:11px;opacity:.8;min-width:35px;">Titel</label>
-                        <input id="pageTitleInput" class="form-control" placeholder="Pagina titel" style="width:240px;height:32px;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-size:13px;" />
-                    </div>
-                    <div style="display:flex;align-items:center;gap:8px;">
-                        <label for="pageSlugInput" style="color:#f8fafc;font-size:11px;opacity:.8;min-width:35px;">Slug</label>
-                        <input id="pageSlugInput" class="form-control" placeholder="pagina-slug" style="width:240px;height:32px;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-size:13px;" />
-                    </div>
+                <div id="pageMetaSection" style="display:none;">
+                    <input id="pageTitleInput" />
+                    <input id="pageSlugInput" />
                 </div>
-                <span id="pageSaveStatus" style="color:#e2e8f0;font-size:12px;margin-right:12px;opacity:.9;white-space:nowrap;display:none;">Niet opgeslagen</span>
-                <button class="btn btn-primary" id="quickStartBtn" aria-label="Quick Start Template" title="Start snel met een professionele template" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; display:none;">
-                    <i class="fas fa-rocket"></i> Quick Start
-                </button>
-                <button class="btn btn-secondary" id="toggleTemplatePreview" aria-label="Template Referentie" title="Toon/verberg template als referentie" style="display:none;">
-                    <i class="fas fa-eye"></i> Template Referentie
-                </button>
-                <button class="btn btn-secondary" id="brandManagerBtn" aria-label="Brand & Layout" title="Brand instellingen, menu en footer beheren" onclick="BrandManager.open()" style="display:none;">
-                    <i class="fas fa-palette"></i> Brand & Layout
-                </button>
-                <button class="btn btn-secondary" id="pagesBtn" aria-label="Paginas beheren" title="Paginas beheren" style="display:none;">
-                    <i class="fas fa-file-alt"></i> Pagina's
-                </button>
-                <button class="btn btn-secondary" id="openProjectBtn" aria-label="Openen" title="Projectbestand openen (.wbproj)">
-                    <i class="fas fa-folder-open"></i> Openen
-                </button>
-                <button class="btn btn-secondary" id="saveProjectBtn" aria-label="Opslaan" title="Project opslaan als bestand (.wbproj)">
-                    <i class="fas fa-save"></i> Opslaan
-                </button>
-                <button class="btn btn-secondary" id="previewBtn" aria-label="Preview">
+                <span id="pageSaveStatus" style="display:none;"></span>
+                <button id="quickStartBtn" style="display:none;"></button>
+                <button id="toggleTemplatePreview" style="display:none;"></button>
+                <button id="brandManagerBtn" style="display:none;"></button>
+                <button id="pagesBtn" style="display:none;"></button>
+                <button id="openProjectBtn" style="display:none;"></button>
+                <button id="saveProjectBtn" style="display:none;"></button>
+                <button id="publishBtn" style="display:none;"></button>
+                <button id="gitPushBtn" style="display:none;"></button>
+                
+                <!-- Only show essential buttons -->
+                <button class="btn btn-secondary" id="previewBtn" aria-label="Preview" title="Bekijk voorbeeld">
                     <i class="fas fa-eye"></i> Preview
                 </button>
-                <button class="btn btn-primary" id="exportBtn" aria-label="Export">
+                <button class="btn btn-primary" id="exportBtn" aria-label="Export" title="Download als HTML">
                     <i class="fas fa-download"></i> Export
-                </button>
-                <!-- Hidden buttons not needed in standalone -->
-                <button class="btn btn-primary" id="publishBtn" aria-label="Publish" title="Commit & Push via PowerShell" style="display:none;">
-                    <i class="fas fa-cloud-upload-alt"></i> Publish
-                </button>
-                <button class="btn btn-primary" id="gitPushBtn" aria-label="Stuur naar GitHub" title="Commit & Push naar GitHub" style="display:none;">
-                    <i class="fas fa-upload"></i> Stuur naar GitHub
                 </button>
             </div>
         </header>
@@ -223,8 +204,8 @@
         </script>
 
         <div class="app-body">
-            <!-- Sidebar met componenten -->
-            <aside class="sidebar">
+            <!-- Sidebar met componenten - hidden by default in standalone -->
+            <aside class="sidebar" style="display:none;">
                 <div class="component-categories">
                     
                     <!-- HERO COMPONENTEN -->
@@ -404,17 +385,27 @@
                 <div class="canvas-wrapper">
                     <div class="canvas" id="canvas">
                         <div class="drop-zone">
-                            <div class="drop-zone-content">
-                                <i class="fas fa-plus-circle"></i>
-                                <p>Sleep componenten hierheen om te beginnen</p>
+                            <div class="drop-zone-content" style="text-align:center;padding:60px 20px;">
+                                <i class="fas fa-plane-departure" style="font-size:48px;color:#667eea;margin-bottom:16px;"></i>
+                                <h2 style="margin:0 0 8px 0;color:#1f2937;font-size:1.5rem;">Welkom bij Travelweb Designer</h2>
+                                <p style="color:#6b7280;margin:0 0 24px 0;">Importeer een reis om te beginnen</p>
+                                <div id="standalone-travel-import" style="max-width:400px;margin:0 auto;">
+                                    <div style="display:flex;gap:8px;align-items:center;">
+                                        <input type="text" id="standalone-idea-id" placeholder="Voer Reis ID in (bijv. 12345)" style="flex:1;padding:12px 16px;border:2px solid #e5e7eb;border-radius:8px;font-size:14px;" />
+                                        <button id="standalone-import-btn" style="padding:12px 24px;background:linear-gradient(135deg,#667eea,#764ba2);color:white;border:none;border-radius:8px;font-weight:600;cursor:pointer;white-space:nowrap;">
+                                            <i class="fas fa-download"></i> Importeren
+                                        </button>
+                                    </div>
+                                    <p style="font-size:12px;color:#9ca3af;margin-top:12px;">Vind je Reis ID in Travel Compositor</p>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </main>
 
-            <!-- Properties panel -->
-            <aside class="properties-panel">
+            <!-- Properties panel - hidden in standalone -->
+            <aside class="properties-panel" style="display:none;">
                 <h3>Eigenschappen</h3>
                 <div class="properties-content" id="propertiesContent">
                     <p class="no-selection">Selecteer een element om eigenschappen te bewerken</p>
@@ -1063,15 +1054,9 @@
         
         if (user) {
           userMenu.innerHTML = `
-            <span style="color:#e2e8f0;font-size:12px;"><i class="fas fa-user"></i> ${user.email}</span>
-            <button class="btn btn-secondary" id="myPagesBtn" style="padding:6px 12px;font-size:12px;">
-              <i class="fas fa-folder"></i> Mijn Pagina's
-            </button>
-            <button class="btn btn-primary" id="saveToCloudBtn" style="padding:6px 12px;font-size:12px;background:#10b981;">
-              <i class="fas fa-cloud-upload-alt"></i> Opslaan
-            </button>
-            <button class="btn btn-secondary" id="logoutBtn" style="padding:6px 12px;font-size:12px;">
-              <i class="fas fa-sign-out-alt"></i>
+            <span style="color:#e2e8f0;font-size:13px;margin-right:8px;"><i class="fas fa-user"></i> ${user.email.split('@')[0]}</span>
+            <button class="btn btn-secondary" id="logoutBtn" style="padding:6px 12px;font-size:12px;" title="Uitloggen">
+              <i class="fas fa-sign-out-alt"></i> Uitloggen
             </button>
           `;
         } else {
@@ -1270,6 +1255,49 @@
             </div>
           `;
         }
+      }
+      
+      // Setup standalone import button
+      const importBtn = document.getElementById('standalone-import-btn');
+      const ideaInput = document.getElementById('standalone-idea-id');
+      
+      if (importBtn && ideaInput) {
+        importBtn.addEventListener('click', async () => {
+          const ideaId = ideaInput.value.trim();
+          if (!ideaId) {
+            alert('Voer een Reis ID in');
+            return;
+          }
+          
+          importBtn.disabled = true;
+          importBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Laden...';
+          
+          try {
+            // Trigger the travel import via TravelView
+            if (window.TravelView && window.TravelView.loadTravel) {
+              await window.TravelView.loadTravel(ideaId);
+            } else if (window.websiteBuilder && window.websiteBuilder.travelView) {
+              await window.websiteBuilder.travelView.loadTravel(ideaId);
+            } else {
+              // Fallback: set hash and reload
+              window.location.hash = '#/mode/travel?idea=' + ideaId;
+              window.location.reload();
+            }
+          } catch (err) {
+            console.error('[Standalone] Import failed:', err);
+            alert('Import mislukt: ' + err.message);
+          } finally {
+            importBtn.disabled = false;
+            importBtn.innerHTML = '<i class="fas fa-download"></i> Importeren';
+          }
+        });
+        
+        // Allow Enter key to trigger import
+        ideaInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            importBtn.click();
+          }
+        });
       }
     })();
   </script>
