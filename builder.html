@@ -109,24 +109,26 @@
                     <i class="fas fa-home"></i> Home
                 </a>
                 
-                <!-- Hidden elements for compatibility -->
-                <select id="buildTypeSelect" style="display:none;">
-                    <option value="travel">Reis Importeren</option>
-                    <option value="page">Website Bouwen</option>
-                </select>
-                <div id="pageMetaSection" style="display:none;">
-                    <input id="pageTitleInput" />
-                    <input id="pageSlugInput" />
+                <!-- Hidden elements for compatibility - completely hidden -->
+                <div style="display:none !important;visibility:hidden;position:absolute;left:-9999px;">
+                    <select id="buildTypeSelect">
+                        <option value="travel">Reis Importeren</option>
+                        <option value="page">Website Bouwen</option>
+                    </select>
+                    <div id="pageMetaSection">
+                        <input id="pageTitleInput" />
+                        <input id="pageSlugInput" />
+                    </div>
+                    <span id="pageSaveStatus"></span>
+                    <button id="quickStartBtn"></button>
+                    <button id="toggleTemplatePreview"></button>
+                    <button id="brandManagerBtn"></button>
+                    <button id="pagesBtn"></button>
+                    <button id="openProjectBtn"></button>
+                    <button id="saveProjectBtn"></button>
+                    <button id="publishBtn"></button>
+                    <button id="gitPushBtn"></button>
                 </div>
-                <span id="pageSaveStatus" style="display:none;"></span>
-                <button id="quickStartBtn" style="display:none;"></button>
-                <button id="toggleTemplatePreview" style="display:none;"></button>
-                <button id="brandManagerBtn" style="display:none;"></button>
-                <button id="pagesBtn" style="display:none;"></button>
-                <button id="openProjectBtn" style="display:none;"></button>
-                <button id="saveProjectBtn" style="display:none;"></button>
-                <button id="publishBtn" style="display:none;"></button>
-                <button id="gitPushBtn" style="display:none;"></button>
                 
                 <!-- Only show essential buttons -->
                 <button class="btn btn-secondary" id="previewBtn" aria-label="Preview" title="Bekijk voorbeeld">
