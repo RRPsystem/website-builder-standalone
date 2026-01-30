@@ -287,17 +287,19 @@
   </div>
 
   <!-- Supabase JS -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   
   <script>
-    // Configuration - will be set by Vercel environment
+    // Configuration
     const SUPABASE_URL = 'https://huaaogdxxdcakxryecnw.supabase.co';
-    const SUPABASE_ANON_KEY = window.STANDALONE_SUPABASE_ANON_KEY || '';
     
     let supabase = null;
+    let configLoaded = false;
     
     // Initialize
     document.addEventListener('DOMContentLoaded', async () => {
+      console.log('[Login] DOM loaded, setting up UI...');
+      
       // Always setup tabs and forms first so UI is interactive
       setupTabs();
       setupForms();
@@ -308,37 +310,45 @@
         const res = await fetch('/api/config');
         if (res.ok) {
           const config = await res.json();
-          console.log('[Login] Config received:', config.SUPABASE_ANON_KEY ? 'Key present' : 'No key');
+          console.log('[Login] Config received:', config.SUPABASE_ANON_KEY ? 'Key present (' + config.SUPABASE_ANON_KEY.substring(0, 20) + '...)' : 'No key');
+          
           if (config.SUPABASE_ANON_KEY) {
-            window.STANDALONE_SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+            // Check if Supabase library is loaded
+            const supabaseLib = window.supabase;
+            console.log('[Login] Supabase library:', supabaseLib ? 'loaded' : 'NOT LOADED');
+            
+            if (supabaseLib && supabaseLib.createClient) {
+              supabase = supabaseLib.createClient(SUPABASE_URL, config.SUPABASE_ANON_KEY);
+              configLoaded = true;
+              console.log('[Login] Supabase client created successfully');
+              
+              // Check if already logged in
+              try {
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session) {
+                  console.log('[Login] Already logged in, redirecting...');
+                  window.location.href = 'builder.html';
+                  return;
+                }
+              } catch (sessionErr) {
+                console.warn('[Login] Session check failed:', sessionErr);
+              }
+            } else {
+              console.error('[Login] Supabase library not available');
+              showError('Supabase library niet geladen. Ververs de pagina.');
+            }
           }
         } else {
           console.warn('[Login] Config fetch failed:', res.status);
+          showError('Configuratie kon niet worden geladen (status ' + res.status + ')');
         }
       } catch (e) {
-        console.warn('[Login] Could not fetch config:', e);
+        console.error('[Login] Could not fetch config:', e);
+        showError('Fout bij laden configuratie: ' + e.message);
       }
       
-      const anonKey = window.STANDALONE_SUPABASE_ANON_KEY;
-      if (anonKey) {
-        try {
-          supabase = window.supabase.createClient(SUPABASE_URL, anonKey);
-          console.log('[Login] Supabase client created');
-          
-          // Check if already logged in
-          const { data: { session } } = await supabase.auth.getSession();
-          if (session) {
-            console.log('[Login] Already logged in, redirecting...');
-            window.location.href = 'builder.html';
-            return;
-          }
-        } catch (e) {
-          console.error('[Login] Supabase init error:', e);
-          showError('Fout bij initialiseren. Check console voor details.');
-        }
-      } else {
-        console.warn('[Login] No SUPABASE_ANON_KEY found');
-        showError('Configuratie niet geladen. Voeg SUPABASE_ANON_KEY toe aan Vercel environment variables.');
+      if (!configLoaded) {
+        console.warn('[Login] Config not loaded, login will not work');
       }
     });
     
