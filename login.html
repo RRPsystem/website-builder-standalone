@@ -293,7 +293,7 @@
     // Configuration
     const SUPABASE_URL = 'https://huaaogdxxdcakxryecnw.supabase.co';
     
-    let supabase = null;
+    let supabaseClient = null;
     let configLoaded = false;
     
     // Initialize
@@ -318,13 +318,13 @@
             console.log('[Login] Supabase library:', supabaseLib ? 'loaded' : 'NOT LOADED');
             
             if (supabaseLib && supabaseLib.createClient) {
-              supabase = supabaseLib.createClient(SUPABASE_URL, config.SUPABASE_ANON_KEY);
+              supabaseClient = supabaseLib.createClient(SUPABASE_URL, config.SUPABASE_ANON_KEY);
               configLoaded = true;
               console.log('[Login] Supabase client created successfully');
               
               // Check if already logged in
               try {
-                const { data: { session } } = await supabase.auth.getSession();
+                const { data: { session } } = await supabaseClient.auth.getSession();
                 if (session) {
                   console.log('[Login] Already logged in, redirecting...');
                   window.location.href = 'builder.html';
@@ -391,7 +391,7 @@
       // Login form
       document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!supabase) {
+        if (!supabaseClient) {
           showError('Supabase niet geconfigureerd');
           return;
         }
@@ -405,7 +405,7 @@
         hideMessages();
         
         try {
-          const { data, error } = await supabase.auth.signInWithPassword({
+          const { data, error } = await supabaseClient.auth.signInWithPassword({
             email,
             password
           });
@@ -426,7 +426,7 @@
       // Register form
       document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!supabase) {
+        if (!supabaseClient) {
           showError('Supabase niet geconfigureerd');
           return;
         }
@@ -446,7 +446,7 @@
         hideMessages();
         
         try {
-          const { data, error } = await supabase.auth.signUp({
+          const { data, error } = await supabaseClient.auth.signUp({
             email,
             password
           });
@@ -473,7 +473,7 @@
       // Forgot password form
       document.getElementById('forgot-form').addEventListener('submit', async (e) => {
         e.preventDefault();
-        if (!supabase) {
+        if (!supabaseClient) {
           showError('Supabase niet geconfigureerd');
           return;
         }
@@ -486,7 +486,7 @@
         hideMessages();
         
         try {
-          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+          const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
             redirectTo: window.location.origin + '/reset-password.html'
           });
           
