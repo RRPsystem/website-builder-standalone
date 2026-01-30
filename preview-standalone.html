@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voorbeeld - Standalone</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="stylesheet" href="styles/main.css?v=20251229">
+  <link rel="stylesheet" href="styles/components.css?v=20251229">
+  <link rel="stylesheet" href="styles/roadbook-timeline.css?v=20251229">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    html, body { height: auto; min-height: 100vh; }
+    body{ background:#fff; margin:0; padding:0; overflow-x:hidden; overflow-y:auto; }
+    #pv-body { 
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    .wb-travel-hero,
+    .wb-hero-banner,
+    .wb-hero-cta {
+      width: 100% !important;
+      max-width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      min-height: 500px !important;
+    }
+    .travel-hero-preview[data-style="interactive-map"] {
+      height: 500px !important;
+    }
+    .wb-content-block,
+    .wb-feature-media,
+    .wb-travel-card,
+    .wb-travel-day-header,
+    .wb-travel-timeline,
+    .wb-travel-intro,
+    .wb-text,
+    .wb-contact-info,
+    .wb-contact-map {
+      max-width: 1100px;
+      margin-left: auto !important;
+      margin-right: auto !important;
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+    .wb-component.edge-to-edge,
+    .wb-feature-media.edge-to-edge,
+    .wb-content-block.edge-to-edge {
+      max-width: 100% !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
+    .wb-travel-timeline {
+      width: 100%;
+      max-width: 1200px;
+    }
+    .wb-component { 
+      margin-top: 2rem !important;
+      margin-bottom: 2rem !important;
+    }
+    .wb-travel-timeline .wb-component {
+      margin-top: 1rem !important;
+      margin-bottom: 1rem !important;
+    }
+  </style>
+</head>
+<body>
+  <main id="pv-body"></main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="js/components.js?v=20251231-roadbook-media-fix"></script>
+  <script src="js/roadbook-timeline-animation.js?v=20251230"></script>
+  <script src="js/previewPage-standalone.js?v=20260130"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('[Preview Standalone] Page loaded');
+      
+      document.addEventListener('click', (e) => {
+        const marker = e.target.closest('.map-marker');
+        if (marker) {
+          const dayId = marker.getAttribute('data-day');
+          if (dayId) {
+            const dayEl = document.getElementById(dayId) || document.querySelector(`[data-day-id="${dayId}"]`);
+            if (dayEl) {
+              dayEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

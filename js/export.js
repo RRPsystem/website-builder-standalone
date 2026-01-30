@@ -62,7 +62,8 @@ class ExportManager {
             if (wantCurrentPage && slug) params.set('page', slug);
             // Cache bust for dev
             params.set('v', 'preview-' + Date.now());
-            const previewUrl = `preview.html?${params.toString()}`;
+            // Standalone version uses preview-standalone.html (no API required)
+            const previewUrl = `preview-standalone.html?${params.toString()}`;
             // Use window.open to maintain opener relationship
             window.open(previewUrl, '_blank', 'noopener=no');
             return;
