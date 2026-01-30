@@ -104,15 +104,15 @@
                 </h1>
             </div>
             <div class="header-right">
+                <!-- Simplified menu for standalone version -->
+                <a href="index.html" class="btn btn-secondary" style="margin-right:8px;" title="Terug naar startscherm">
+                    <i class="fas fa-home"></i>
+                </a>
                 <select id="buildTypeSelect" class="form-control" style="height:36px;padding:6px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:white;color:#1f2937;font-weight:600;font-size:14px;cursor:pointer;margin-right:16px;">
-                    <option value="page">📄 Web pagina</option>
-                    <option value="travel">✈️ Reizen</option>
-                    <option value="video-generator">🎬 Video Generator</option>
-                    <option value="news">📰 Nieuwsartikel</option>
-                    <option value="booking">📅 Bestemmingspagina</option>
-                    <option value="menu">🍽️ Menu & footer</option>
+                    <option value="travel">✈️ Reis Importeren</option>
+                    <option value="page">📄 Website Bouwen</option>
                 </select>
-                <div class="page-meta" style="display:flex;flex-direction:column;gap:4px;margin-right:16px;">
+                <div class="page-meta" id="pageMetaSection" style="display:none;flex-direction:column;gap:4px;margin-right:16px;">
                     <div style="display:flex;align-items:center;gap:8px;">
                         <label for="pageTitleInput" style="color:#f8fafc;font-size:11px;opacity:.8;min-width:35px;">Titel</label>
                         <input id="pageTitleInput" class="form-control" placeholder="Pagina titel" style="width:240px;height:32px;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-size:13px;" />
@@ -122,17 +122,17 @@
                         <input id="pageSlugInput" class="form-control" placeholder="pagina-slug" style="width:240px;height:32px;padding:6px 10px;border-radius:6px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:white;font-size:13px;" />
                     </div>
                 </div>
-                <span id="pageSaveStatus" style="color:#e2e8f0;font-size:12px;margin-right:12px;opacity:.9;white-space:nowrap;">Niet opgeslagen</span>
-                <button class="btn btn-primary" id="quickStartBtn" aria-label="Quick Start Template" title="Start snel met een professionele template" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                <span id="pageSaveStatus" style="color:#e2e8f0;font-size:12px;margin-right:12px;opacity:.9;white-space:nowrap;display:none;">Niet opgeslagen</span>
+                <button class="btn btn-primary" id="quickStartBtn" aria-label="Quick Start Template" title="Start snel met een professionele template" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; display:none;">
                     <i class="fas fa-rocket"></i> Quick Start
                 </button>
                 <button class="btn btn-secondary" id="toggleTemplatePreview" aria-label="Template Referentie" title="Toon/verberg template als referentie" style="display:none;">
                     <i class="fas fa-eye"></i> Template Referentie
                 </button>
-                <button class="btn btn-secondary" id="brandManagerBtn" aria-label="Brand & Layout" title="Brand instellingen, menu en footer beheren" onclick="BrandManager.open()">
+                <button class="btn btn-secondary" id="brandManagerBtn" aria-label="Brand & Layout" title="Brand instellingen, menu en footer beheren" onclick="BrandManager.open()" style="display:none;">
                     <i class="fas fa-palette"></i> Brand & Layout
                 </button>
-                <button class="btn btn-secondary" id="pagesBtn" aria-label="Paginas beheren" title="Paginas beheren">
+                <button class="btn btn-secondary" id="pagesBtn" aria-label="Paginas beheren" title="Paginas beheren" style="display:none;">
                     <i class="fas fa-file-alt"></i> Pagina's
                 </button>
                 <button class="btn btn-secondary" id="openProjectBtn" aria-label="Openen" title="Projectbestand openen (.wbproj)">
@@ -147,23 +147,79 @@
                 <button class="btn btn-primary" id="exportBtn" aria-label="Export">
                     <i class="fas fa-download"></i> Export
                 </button>
-                <button class="btn btn-primary" id="publishBtn" aria-label="Publish" title="Commit & Push via PowerShell">
+                <!-- Hidden buttons not needed in standalone -->
+                <button class="btn btn-primary" id="publishBtn" aria-label="Publish" title="Commit & Push via PowerShell" style="display:none;">
                     <i class="fas fa-cloud-upload-alt"></i> Publish
                 </button>
-                <button class="btn btn-primary" id="gitPushBtn" aria-label="Stuur naar GitHub" title="Commit & Push naar GitHub">
+                <button class="btn btn-primary" id="gitPushBtn" aria-label="Stuur naar GitHub" title="Commit & Push naar GitHub" style="display:none;">
                     <i class="fas fa-upload"></i> Stuur naar GitHub
                 </button>
             </div>
         </header>
         <script>
+            // Standalone version: Show/hide UI elements based on mode
+            function updateStandaloneUI(mode) {
+                const sidebar = document.querySelector('.sidebar');
+                const pageMetaSection = document.getElementById('pageMetaSection');
+                const pageSaveStatus = document.getElementById('pageSaveStatus');
+                const quickStartBtn = document.getElementById('quickStartBtn');
+                const brandManagerBtn = document.getElementById('brandManagerBtn');
+                const pagesBtn = document.getElementById('pagesBtn');
+                
+                const isPageMode = (mode === 'page');
+                
+                // Show sidebar only in page/website building mode
+                if (sidebar) {
+                    sidebar.style.display = isPageMode ? 'block' : 'none';
+                }
+                
+                // Show page meta inputs only in page mode
+                if (pageMetaSection) {
+                    pageMetaSection.style.display = isPageMode ? 'flex' : 'none';
+                }
+                if (pageSaveStatus) {
+                    pageSaveStatus.style.display = isPageMode ? 'inline' : 'none';
+                }
+                if (quickStartBtn) {
+                    quickStartBtn.style.display = isPageMode ? 'inline-flex' : 'none';
+                }
+                if (brandManagerBtn) {
+                    brandManagerBtn.style.display = isPageMode ? 'inline-flex' : 'none';
+                }
+                if (pagesBtn) {
+                    pagesBtn.style.display = isPageMode ? 'inline-flex' : 'none';
+                }
+                
+                console.log('[Standalone] UI updated for mode:', mode, 'sidebar visible:', isPageMode);
+            }
+            
             // Build type selector handler
             document.getElementById('buildTypeSelect')?.addEventListener('change', function(e) {
                 const mode = e.target.value;
                 console.log('[Header] Build type changed to:', mode);
+                updateStandaloneUI(mode);
                 if (window.WB_setMode) {
                     window.WB_setMode(mode);
                 }
             });
+            
+            // Check URL hash for initial mode
+            (function() {
+                const hash = window.location.hash;
+                const select = document.getElementById('buildTypeSelect');
+                
+                if (hash.includes('/mode/travel') || hash.includes('/mode/travel')) {
+                    if (select) select.value = 'travel';
+                    updateStandaloneUI('travel');
+                } else if (hash.includes('/mode/page')) {
+                    if (select) select.value = 'page';
+                    updateStandaloneUI('page');
+                } else {
+                    // Default to travel mode
+                    if (select) select.value = 'travel';
+                    updateStandaloneUI('travel');
+                }
+            })();
         </script>
 
         <div class="app-body">

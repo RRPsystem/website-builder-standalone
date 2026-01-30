@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Website Studio - Bouw je website in minuten met AI</title>
-    <meta name="description" content="Creëer professionele websites in minuten met onze AI-powered website builder. Geen code nodig, volledig aanpasbaar.">
+    <title>Travelweb Designer - Reis Importeren & Website Builder</title>
+    <meta name="description" content="Importeer reizen vanuit Travel Compositor en bouw professionele reiswebsites.">
     
     <!-- Favicon -->
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' ry='18' fill='%234CAF50'/%3E%3Ctext x='50' y='62' font-size='60' text-anchor='middle' fill='white'%3EW%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='18' ry='18' fill='%23667eea'/%3E%3Ctext x='50' y='62' font-size='60' text-anchor='middle' fill='white'%3ET%3C/text%3E%3C/svg%3E">
     
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -20,10 +20,10 @@
         }
 
         :root {
-            --primary: #4CAF50;
-            --primary-dark: #45a049;
-            --secondary: #2196F3;
-            --accent: #FF9800;
+            --primary: #667eea;
+            --primary-dark: #5a67d8;
+            --secondary: #764ba2;
+            --accent: #ec4899;
             --dark: #1a1a1a;
             --gray: #6b7280;
             --light-gray: #f3f4f6;
@@ -33,464 +33,223 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
             color: var(--dark);
-            overflow-x: hidden;
-        }
-
-        /* Hero Section */
-        .hero {
             min-height: 100vh;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 70px);
+            padding: 2rem;
+        }
+
+        .dashboard {
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .welcome-text {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+
+        .welcome-text h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-text p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        /* Action Cards */
+        .action-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .action-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
             position: relative;
             overflow: hidden;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
         }
 
-        .hero::before {
+        .action-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            animation: pulse 8s ease-in-out infinite;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
         }
 
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+        .action-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 1;
-            text-align: center;
-            max-width: 900px;
-            color: white;
+        .action-card.primary::before {
+            background: linear-gradient(90deg, #10b981, #059669);
         }
 
-        .hero h1 {
-            font-size: clamp(2.5rem, 6vw, 4.5rem);
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-            line-height: 1.2;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        .action-card.primary .card-icon {
+            background: linear-gradient(135deg, #10b981, #059669);
         }
 
-        .hero h1 .gradient-text {
-            background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .hero p {
-            font-size: clamp(1.1rem, 2vw, 1.5rem);
-            margin-bottom: 3rem;
-            opacity: 0.95;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        .cta-buttons {
-            display: flex;
-            gap: 1.5rem;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .btn {
-            padding: 1rem 2.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            cursor: pointer;
-            border: none;
-        }
-
-        .btn-primary {
-            background: white;
-            color: #667eea;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-3px);
-        }
-
-        /* Features Section */
-        .features {
-            padding: 6rem 2rem;
-            background: white;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .section-header {
-            text-align: center;
-            margin-bottom: 4rem;
-        }
-
-        .section-header h2 {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 800;
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-
-        .section-header p {
-            font-size: 1.2rem;
-            color: var(--gray);
-            max-width: 600px;
-            margin: 0 auto;
-        }
-
-        .features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2.5rem;
-        }
-
-        .feature-card {
-            padding: 2.5rem;
-            background: white;
-            border-radius: 20px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            border: 1px solid #e5e7eb;
-            transform-style: preserve-3d;
-            perspective: 1000px;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            border-radius: 20px;
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-            z-index: 0;
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-card:hover {
-            transform: translateY(-15px) rotateX(5deg) scale(1.02);
-            box-shadow: 
-                0 30px 60px rgba(102, 126, 234, 0.2),
-                0 15px 30px rgba(118, 75, 162, 0.15);
-            border-color: rgba(102, 126, 234, 0.3);
-        }
-
-        .feature-card > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        .feature-icon {
-            width: 70px;
-            height: 70px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        .card-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             border-radius: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            color: white;
-            margin-bottom: 1.5rem;
-        }
-
-        .feature-card h3 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 1rem;
-            color: var(--dark);
-        }
-
-        .feature-card p {
-            color: var(--gray);
-            line-height: 1.8;
-        }
-
-        /* How It Works */
-        .how-it-works {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-        }
-
-        .steps {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 2rem;
-            margin-top: 3rem;
-        }
-
-        .step {
-            text-align: center;
-            position: relative;
-            padding: 2rem;
-            background: white;
-            border-radius: 20px;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            transform-style: preserve-3d;
-        }
-
-        .step:hover {
-            transform: translateY(-10px) rotateY(5deg) scale(1.05);
-            box-shadow: 
-                0 25px 50px rgba(102, 126, 234, 0.15),
-                0 10px 20px rgba(118, 75, 162, 0.1);
-        }
-
-        .step-number {
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 800;
+            font-size: 2.5rem;
             color: white;
             margin: 0 auto 1.5rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .step h3 {
-            font-size: 1.3rem;
+        .action-card h2 {
+            font-size: 1.5rem;
             font-weight: 700;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
             color: var(--dark);
         }
 
-        .step p {
+        .action-card p {
             color: var(--gray);
+            font-size: 0.95rem;
+            line-height: 1.6;
         }
 
-        /* CTA Section */
-        .cta-section {
-            padding: 6rem 2rem;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            text-align: center;
+        .card-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
             color: white;
-        }
-
-        .cta-section h2 {
-            font-size: clamp(2rem, 4vw, 3rem);
-            font-weight: 800;
-            margin-bottom: 1.5rem;
-        }
-
-        .cta-section p {
-            font-size: 1.2rem;
-            margin-bottom: 2.5rem;
-            opacity: 0.95;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 1rem;
         }
 
         /* Footer */
-        footer {
-            padding: 3rem 2rem;
-            background: var(--dark);
-            color: white;
+        .footer {
             text-align: center;
-        }
-
-        footer p {
-            opacity: 0.8;
-        }
-
-        footer a {
-            color: var(--primary);
-            text-decoration: none;
-        }
-
-        footer a:hover {
-            text-decoration: underline;
-        }
-
-        /* Animations */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .animate-in {
-            animation: fadeInUp 0.8s ease-out;
+            padding: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.875rem;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .cta-buttons {
-                flex-direction: column;
+            .welcome-text h1 {
+                font-size: 1.75rem;
             }
 
-            .btn {
-                width: 100%;
-                justify-content: center;
+            .action-card {
+                padding: 2rem;
+            }
+
+            .card-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.75rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="hero-content animate-in">
-            <h1>
-                <span class="gradient-text">AI Website Studio</span><br>
-                Bouw je reis- en bestemmingswebsite in minuten
-            </h1>
-            <p>
-                De ultieme website builder voor reisbureaus en touroperators. Met AI-powered content, booking integraties en automatische routebeschrijvingen.
-            </p>
-            <div class="cta-buttons">
-                <a href="builder.html" class="btn btn-primary">
-                    <i class="fas fa-rocket"></i>
-                    Start nu gratis
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            <i class="fas fa-code"></i>
+            <span>Travelweb Designer</span>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="dashboard">
+            <div class="welcome-text">
+                <h1>Wat wil je doen?</h1>
+                <p>Kies een optie om te beginnen</p>
+            </div>
+
+            <div class="action-cards">
+                <!-- Reis Importeren - Primary/Prominent -->
+                <a href="builder.html#/mode/travel" class="action-card primary">
+                    <div class="card-icon">
+                        <i class="fas fa-plane-arrival"></i>
+                    </div>
+                    <h2>Reis Importeren</h2>
+                    <p>Importeer een reis vanuit Travel Compositor, PDF, URL of voer handmatig in.</p>
+                    <span class="card-badge">Meest gebruikt</span>
                 </a>
-                <a href="#features" class="btn btn-secondary">
-                    <i class="fas fa-info-circle"></i>
-                    Meer info
+
+                <!-- Website Bouwen -->
+                <a href="builder.html#/mode/page" class="action-card">
+                    <div class="card-icon">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <h2>Website Bouwen</h2>
+                    <p>Bouw een professionele reiswebsite met drag & drop componenten.</p>
+                </a>
+
+                <!-- Bestaand Project Openen -->
+                <a href="builder.html#/open" class="action-card">
+                    <div class="card-icon">
+                        <i class="fas fa-folder-open"></i>
+                    </div>
+                    <h2>Project Openen</h2>
+                    <p>Open een bestaand project of importeer een .wbproj bestand.</p>
                 </a>
             </div>
         </div>
-    </section>
-
-    <!-- Features Section -->
-    <section id="features" class="features">
-        <div class="container">
-            <div class="section-header">
-                <h2>Waarom AI Website Studio?</h2>
-                <p>Alles wat je nodig hebt om een professionele website te bouwen</p>
-            </div>
-            <div class="features-grid">
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-plug"></i>
-                    </div>
-                    <h3>API Koppelingen</h3>
-                    <p>Directe integratie met booking engines en zoek & boek systemen. Realtime beschikbaarheid en prijzen.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-route"></i>
-                    </div>
-                    <h3>AI Routebeschrijvingen</h3>
-                    <p>Automatische routebeschrijvingen met OpenAI, Google Search en Google Places. Inclusief interactieve kaarten.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-video"></i>
-                    </div>
-                    <h3>AI Video Generator</h3>
-                    <p>Genereer automatisch professionele video's voor je bestemmingen en reizen met AI.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-globe-europe"></i>
-                    </div>
-                    <h3>Bestemmings Bibliotheek</h3>
-                    <p>Uitgebreide bibliotheek met bestemmingen, complete met content, foto's en informatie.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-images"></i>
-                    </div>
-                    <h3>Media Selector</h3>
-                    <p>Kies media van YouTube, Pexels, Unsplash of upload je eigen bestanden. Alles in één interface.</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">
-                        <i class="fas fa-newspaper"></i>
-                    </div>
-                    <h3>Nieuwsberichten Systeem</h3>
-                    <p>Ingebouwd CMS voor nieuwsberichten en updates. Houd je klanten op de hoogte.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- How It Works -->
-    <section class="how-it-works">
-        <div class="container">
-            <div class="section-header">
-                <h2>Hoe werkt het?</h2>
-                <p>In 3 simpele stappen naar je eigen website</p>
-            </div>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <h3>Koppel je booking engine</h3>
-                    <p>Verbind met je bestaande systemen via API of start met onze bestemmings bibliotheek</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <h3>Bouw met AI</h3>
-                    <p>Genereer automatisch routes, video's en content. Kies media van Unsplash, Pexels of YouTube</p>
-                </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <h3>Publiceer & Beheer</h3>
-                    <p>Ga live met één klik. Update nieuwsberichten en bestemmingen via het ingebouwde CMS</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- CTA Section -->
-    <section class="cta-section">
-        <div class="container">
-            <h2>Klaar om te beginnen?</h2>
-            <p>Start vandaag nog met het bouwen van je droomwebsite</p>
-            <a href="builder.html" class="btn btn-primary" style="font-size: 1.2rem; padding: 1.2rem 3rem;">
-                <i class="fas fa-rocket"></i>
-                Start nu gratis
-            </a>
-        </div>
-    </section>
+    </main>
 
     <!-- Footer -->
-    <footer>
-        <div class="container">
-            <p>&copy; 2024 AI Website Studio. Gemaakt met <i class="fas fa-heart" style="color: #e74c3c;"></i> in Nederland</p>
-        </div>
+    <footer class="footer">
+        <p>&copy; 2025 Travelweb Designer - Standalone versie</p>
     </footer>
 
     <script>
@@ -501,7 +260,7 @@
                                url.searchParams.has('api') || 
                                url.searchParams.has('token') ||
                                url.searchParams.has('page_id') ||
-                               url.searchParams.has('news_slug') ||
+                               url.searchParams.has('id') ||
                                url.searchParams.has('slug');
             
             if (hasDeeplink) {
@@ -509,42 +268,6 @@
                 window.location.href = 'builder.html' + url.search + url.hash;
             }
         })();
-
-        // Smooth scroll for anchor links
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                const target = document.querySelector(this.getAttribute('href'));
-                if (target) {
-                    target.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            });
-        });
-
-        // Animate elements on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.animation = 'fadeInUp 0.8s ease-out';
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, observerOptions);
-
-        document.querySelectorAll('.feature-card, .step').forEach(el => {
-            observer.observe(el);
-        });
     </script>
-    
-    <!-- Roadbook Timeline Animation -->
-    <script src="js/roadbook-timeline-animation.js"></script>
 </body>
 </html>
