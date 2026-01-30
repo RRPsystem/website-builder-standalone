@@ -186,19 +186,19 @@
                 }
             });
             
-            // Check URL hash for initial mode
+            // Check URL hash for initial mode - default to travel mode for standalone
             (function() {
                 const hash = window.location.hash;
                 const select = document.getElementById('buildTypeSelect');
                 
-                if (hash.includes('/mode/travel') || hash.includes('/mode/travel')) {
-                    if (select) select.value = 'travel';
-                    updateStandaloneUI('travel');
-                } else if (hash.includes('/mode/page')) {
+                if (hash.includes('/mode/page')) {
                     if (select) select.value = 'page';
                     updateStandaloneUI('page');
                 } else {
-                    // Default to travel mode
+                    // Default to travel mode - set hash if not present
+                    if (!hash.includes('/mode/travel')) {
+                        window.location.hash = '#/mode/travel';
+                    }
                     if (select) select.value = 'travel';
                     updateStandaloneUI('travel');
                 }
