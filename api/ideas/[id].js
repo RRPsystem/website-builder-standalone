@@ -66,7 +66,8 @@ export default async function handler(req, res) {
         break;
       }
     }
-    const base = TC_BASE_URL.replace(/\/$/, '');
+    // Remove trailing slash and /resources if present to avoid duplication
+    const base = TC_BASE_URL.replace(/\/$/, '').replace(/\/resources\/?$/, '');
     const AUTH_PATH = (process.env.TC_AUTH_PATH || '/resources/authentication/authenticate');
     const IDEAS_PATH = (process.env.TC_TRAVELIDEA_PATH || '/resources/travelidea');
 
