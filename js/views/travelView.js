@@ -902,9 +902,149 @@
 
         this.currentIdea = data;
         
-        // Standalone version: Skip BOLT database save, just show success
-        console.log('[TravelView] Standalone mode - skipping BOLT save, rendering directly');
-        this.showStatus('success', `✅ Reis geladen! ID: ${ideaId}`);
+        // Save to BOLT database
+        try {
+          if (window.TravelDataService) {
+            console.log('[TravelView] Saving travel to BOLT...');
+            
+            // Extract data from TC response structure
+            const firstDestination = data.destinations?.[0];
+            const firstHotel = data.hotels?.[0];
+            const totalNights = data.hotels?.reduce((sum, h) => sum + (h.nights || 0), 0) || 0;
+            
+            // Create title from destinations (e.g. "Rondreis Dublin, Belfast, Galway")
+            const destinationNames = [...new Set(data.destinations?.map(d => d.name) || [])];
+            const title = destinationNames.length > 0 
+              ? `Rondreis ${destinationNames.slice(0, 3).join(', ')}${destinationNames.length > 3 ? '...' : ''}`
+              : 'Rondreis';
+            
+            // Calculate total price from all components
+            let totalPrice = 0;
+            data.hotels?.forEach(h => totalPrice += h.priceBreakdown?.totalPrice?.microsite?.amount || 0);
+            data.transports?.forEach(t => totalPrice += t.priceBreakdown?.totalPrice?.microsite?.amount || 0);
+            data.cars?.forEach(c => totalPrice += c.priceBreakdown?.totalPrice?.microsite?.amount || 0);
+            
+            // Generate HTML content from Travel Compositor data
+            const htmlContent = this.generateTravelHTML(data, title, totalPrice, totalNights);
+            
+            const travelData = {
+              // Don't set id - let BOLT auto-generate UUID
+              title: title,
+              slug: ideaId,  // Use IFD number as slug
+              description: firstDestination?.description || '',
+              featured_image: firstDestination?.imageUrls?.[0] || firstHotel?.hotelData?.images?.[0]?.url || '',
+              price: Math.round(totalPrice),
+              duration_days: totalNights,
+              content: htmlContent,
+              html: htmlContent,
+              // Don't set destination_id - BOLT expects UUID, not code
+              status: 'draft',
+              source: 'travel-compositor',
+              tc_idea_id: ideaId  // Store TC idea ID for reference
+            };
+            
+            console.log('[TravelView] Prepared data for save:', travelData);
+            
+            const savedTravel = await window.TravelDataService.saveTravel(travelData);
+            console.log('[TravelView] Travel saved to BOLT:', savedTravel);
+            
+            // Create trip_brand_assignment to make it visible on website
+            if (savedTravel && savedTravel.id) {
+              try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const brand_id = urlParams.get('brand_id') || window.BOLT_DB?.brandId;
+                const baseUrl = window.BOLT_DB.url.replace(/\/functions\/v1$/, '');
+                const jwtToken = urlParams.get('token') || window.BOLT_DB?.token || window.BOLT_DB?.jwt || '';
+                const authHeader = jwtToken ? `Bearer ${jwtToken}` : `Bearer ${window.BOLT_DB.anonKey}`;
+
+                const isLikelySupabaseJwt = (() => {
+                  try {
+                    const parts = String(jwtToken || '').split('.');
+                    if (parts.length < 2) return false;
+                    const b64 = parts[1].replace(/-/g, '+').replace(/_/g, '/');
+                    const json = atob(b64);
+                    const payload = JSON.parse(json);
+                    const iss = payload && payload.iss ? String(payload.iss) : '';
+                    if (!iss) return false;
+                    return /supabase/i.test(iss) || /\/auth\/v1/i.test(iss);
+                  } catch (e) {
+                    return false;
+                  }
+                })();
+
+                if (!isLikelySupabaseJwt) {
+                  console.info('[TravelView] Skipping trip_brand_assignments create (token is not a Supabase JWT)');
+                  // Continue anyway
+                  throw null;
+                }
+                
+                console.log('[TravelView] Creating trip assignment for brand:', brand_id);
+                
+                const normStatus = (s) => String(s || '').trim().toLowerCase();
+                const tripStatus = normStatus(savedTravel.status || travelData.status);
+                const shouldPublish = tripStatus === 'live';
+                
+                const assignmentData = {
+                  trip_id: savedTravel.id,
+                  brand_id: brand_id,
+                  is_published: shouldPublish,
+                  status: shouldPublish ? 'accepted' : 'draft',
+                  priority: 999
+                };
+                
+                const assignmentResp = await fetch(`${baseUrl}/rest/v1/trip_brand_assignments`, {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': window.BOLT_DB.anonKey,
+                    'Authorization': authHeader,
+                    'Prefer': 'return=representation'
+                  },
+                  body: JSON.stringify(assignmentData)
+                });
+                
+                if (assignmentResp.ok) {
+                  console.log('[TravelView] Trip assignment created successfully');
+                } else {
+                  const error = await assignmentResp.text();
+                  console.warn('[TravelView] Could not create assignment:', error);
+                  // Don't fail the whole import if assignment fails
+                }
+              } catch (assignError) {
+                if (assignError) {
+                  console.warn('[TravelView] Assignment creation failed:', assignError);
+                }
+                // Continue anyway
+              }
+            }
+            
+            // Update URL with trip ID to prevent duplicates on next save
+            if (savedTravel && savedTravel.id) {
+              const url = new URL(window.location.href);
+              url.searchParams.set('id', savedTravel.id);
+              url.searchParams.set('trip_id', savedTravel.id);
+              window.history.replaceState({}, '', url);
+              console.log('[TravelView] Updated URL with trip ID:', savedTravel.id);
+              
+              // Also update WebBuilder's currentPageId if available
+              if (window.WebBuilder && window.WebBuilder.currentPageId !== savedTravel.id) {
+                window.WebBuilder.currentPageId = savedTravel.id;
+                console.log('[TravelView] Updated WebBuilder.currentPageId:', savedTravel.id);
+              }
+            }
+            
+            // DEBUG: Show success and wait before redirect
+            this.showStatus('success', `✅ Importeren gelukt! Reis is opgeslagen - ID: ${savedTravel.id}`);
+            
+            // Wait 2 seconds to show success message
+            await new Promise(resolve => setTimeout(resolve, 2000));
+          }
+        } catch (saveError) {
+          console.error('[TravelView] Error saving to BOLT:', saveError);
+          this.showStatus('error', `❌ Fout bij opslaan: ${saveError.message}`);
+          // Don't redirect on error
+          return;
+        }
         
         // Check if roadbook template is selected - load directly
         if (template === 'roadbook') {
