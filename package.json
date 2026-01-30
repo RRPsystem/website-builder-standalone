@@ -14,7 +14,7 @@
   "dependencies": {
     "@supabase/supabase-js": "^2.39.0",
     "@vercel/blob": "^0.23.4",
-    "axios": "^1.7.7",
+    "axios": "^1.13.4",
     "cheerio": "^1.0.0-rc.12",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
