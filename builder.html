@@ -1013,6 +1013,266 @@
   
   <!-- Roadbook Timeline Animation -->
   <script src="js/roadbook-timeline-animation.js?v=20251107scrollfix"></script>
+  
+  <!-- Standalone Auth & Page Service -->
+  <script src="js/auth.js?v=20260130"></script>
+  <script src="js/pageService.js?v=20260130"></script>
+  
+  <!-- Standalone Login/Save UI -->
+  <script>
+    (async function initStandaloneAuth() {
+      // Wait for DOM and config
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initStandaloneAuth);
+        return;
+      }
+      
+      // Fetch config for Supabase anon key
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) {
+          const config = await res.json();
+          window.STANDALONE_CONFIG = config;
+          if (config.SUPABASE_ANON_KEY && window.supabase) {
+            window.standaloneSupabase = window.supabase.createClient(
+              config.SUPABASE_URL || 'https://huaaogdxxdcakxryecnw.supabase.co',
+              config.SUPABASE_ANON_KEY
+            );
+          }
+        }
+      } catch (e) {
+        console.warn('[Standalone] Config fetch failed:', e);
+      }
+      
+      // Add user menu to header
+      const headerRight = document.querySelector('.header-right');
+      if (headerRight) {
+        // Create user menu container
+        const userMenu = document.createElement('div');
+        userMenu.id = 'standalone-user-menu';
+        userMenu.style.cssText = 'display:flex;align-items:center;gap:8px;margin-left:16px;';
+        
+        // Check if logged in
+        let user = null;
+        if (window.standaloneSupabase) {
+          try {
+            const { data: { session } } = await window.standaloneSupabase.auth.getSession();
+            user = session?.user;
+          } catch (e) {}
+        }
+        
+        if (user) {
+          userMenu.innerHTML = `
+            <span style="color:#e2e8f0;font-size:12px;"><i class="fas fa-user"></i> ${user.email}</span>
+            <button class="btn btn-secondary" id="myPagesBtn" style="padding:6px 12px;font-size:12px;">
+              <i class="fas fa-folder"></i> Mijn Pagina's
+            </button>
+            <button class="btn btn-primary" id="saveToCloudBtn" style="padding:6px 12px;font-size:12px;background:#10b981;">
+              <i class="fas fa-cloud-upload-alt"></i> Opslaan
+            </button>
+            <button class="btn btn-secondary" id="logoutBtn" style="padding:6px 12px;font-size:12px;">
+              <i class="fas fa-sign-out-alt"></i>
+            </button>
+          `;
+        } else {
+          userMenu.innerHTML = `
+            <a href="login.html" class="btn btn-primary" style="padding:6px 12px;font-size:12px;">
+              <i class="fas fa-sign-in-alt"></i> Inloggen
+            </a>
+          `;
+        }
+        
+        headerRight.appendChild(userMenu);
+        
+        // Setup event handlers
+        if (user) {
+          document.getElementById('logoutBtn')?.addEventListener('click', async () => {
+            if (window.standaloneSupabase) {
+              await window.standaloneSupabase.auth.signOut();
+              window.location.reload();
+            }
+          });
+          
+          document.getElementById('saveToCloudBtn')?.addEventListener('click', async () => {
+            await savePageToCloud();
+          });
+          
+          document.getElementById('myPagesBtn')?.addEventListener('click', () => {
+            showMyPagesModal();
+          });
+        }
+      }
+      
+      // Save to cloud function
+      async function savePageToCloud() {
+        const btn = document.getElementById('saveToCloudBtn');
+        if (!btn) return;
+        
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Opslaan...';
+        btn.disabled = true;
+        
+        try {
+          const canvas = document.getElementById('canvas');
+          const titleInput = document.getElementById('pageTitleInput');
+          const slugInput = document.getElementById('pageSlugInput');
+          
+          const title = titleInput?.value || 'Mijn Pagina';
+          const slug = slugInput?.value || title.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+          const content = canvas?.innerHTML || '';
+          
+          // Get project JSON if available
+          let contentJson = null;
+          try {
+            const saved = localStorage.getItem('wb_project');
+            if (saved) contentJson = JSON.parse(saved);
+          } catch (e) {}
+          
+          // Get current page ID if editing existing
+          const pageId = window.currentStandalonePageId || null;
+          
+          const result = await window.PageService.savePage({
+            id: pageId,
+            title,
+            slug,
+            content,
+            content_json: contentJson,
+            status: 'draft'
+          });
+          
+          window.currentStandalonePageId = result.id;
+          
+          // Show success
+          btn.innerHTML = '<i class="fas fa-check"></i> Opgeslagen!';
+          btn.style.background = '#10b981';
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.style.background = '';
+          }, 2000);
+          
+        } catch (err) {
+          console.error('[Standalone] Save failed:', err);
+          btn.innerHTML = '<i class="fas fa-times"></i> Fout!';
+          btn.style.background = '#ef4444';
+          setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.style.background = '';
+          }, 2000);
+          alert('Opslaan mislukt: ' + err.message);
+        } finally {
+          btn.disabled = false;
+        }
+      }
+      
+      // My Pages modal
+      async function showMyPagesModal() {
+        // Remove existing modal
+        document.getElementById('my-pages-modal')?.remove();
+        
+        const modal = document.createElement('div');
+        modal.id = 'my-pages-modal';
+        modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;';
+        modal.innerHTML = `
+          <div style="background:white;border-radius:12px;max-width:600px;width:90%;max-height:80vh;overflow:hidden;box-shadow:0 25px 50px rgba(0,0,0,0.25);">
+            <div style="padding:16px 20px;border-bottom:1px solid #e5e7eb;display:flex;justify-content:space-between;align-items:center;">
+              <h3 style="margin:0;font-size:1.125rem;"><i class="fas fa-folder"></i> Mijn Pagina's</h3>
+              <button id="close-pages-modal" style="background:none;border:none;font-size:1.25rem;cursor:pointer;color:#6b7280;">&times;</button>
+            </div>
+            <div id="pages-list" style="padding:20px;max-height:60vh;overflow-y:auto;">
+              <div style="text-align:center;padding:40px;color:#6b7280;">
+                <i class="fas fa-spinner fa-spin" style="font-size:2rem;"></i>
+                <p>Laden...</p>
+              </div>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+        
+        // Close handlers
+        document.getElementById('close-pages-modal').onclick = () => modal.remove();
+        modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+        
+        // Load pages
+        try {
+          const pages = await window.PageService.listPages();
+          const listEl = document.getElementById('pages-list');
+          
+          if (!pages || pages.length === 0) {
+            listEl.innerHTML = `
+              <div style="text-align:center;padding:40px;color:#6b7280;">
+                <i class="fas fa-file-alt" style="font-size:3rem;opacity:0.5;margin-bottom:16px;"></i>
+                <p>Je hebt nog geen opgeslagen pagina's</p>
+              </div>
+            `;
+            return;
+          }
+          
+          listEl.innerHTML = pages.map(page => `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px;border:1px solid #e5e7eb;border-radius:8px;margin-bottom:8px;">
+              <div>
+                <strong>${page.title}</strong>
+                <div style="font-size:0.75rem;color:#6b7280;">/${page.slug} • ${new Date(page.updated_at).toLocaleDateString('nl-NL')}</div>
+              </div>
+              <div style="display:flex;gap:8px;">
+                <button class="load-page-btn" data-id="${page.id}" style="padding:6px 12px;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;">
+                  <i class="fas fa-edit"></i> Bewerken
+                </button>
+                <button class="delete-page-btn" data-id="${page.id}" style="padding:6px 12px;background:#ef4444;color:white;border:none;border-radius:6px;cursor:pointer;font-size:12px;">
+                  <i class="fas fa-trash"></i>
+                </button>
+              </div>
+            </div>
+          `).join('');
+          
+          // Load page handlers
+          listEl.querySelectorAll('.load-page-btn').forEach(btn => {
+            btn.onclick = async () => {
+              const pageId = btn.dataset.id;
+              try {
+                const page = await window.PageService.getPage(pageId);
+                const canvas = document.getElementById('canvas');
+                if (canvas && page.content) {
+                  canvas.innerHTML = page.content;
+                }
+                document.getElementById('pageTitleInput').value = page.title || '';
+                document.getElementById('pageSlugInput').value = page.slug || '';
+                window.currentStandalonePageId = page.id;
+                
+                // Switch to page mode
+                document.getElementById('buildTypeSelect').value = 'page';
+                updateStandaloneUI('page');
+                
+                modal.remove();
+              } catch (e) {
+                alert('Laden mislukt: ' + e.message);
+              }
+            };
+          });
+          
+          // Delete page handlers
+          listEl.querySelectorAll('.delete-page-btn').forEach(btn => {
+            btn.onclick = async () => {
+              if (!confirm('Weet je zeker dat je deze pagina wilt verwijderen?')) return;
+              try {
+                await window.PageService.deletePage(btn.dataset.id);
+                btn.closest('div[style*="border"]').remove();
+              } catch (e) {
+                alert('Verwijderen mislukt: ' + e.message);
+              }
+            };
+          });
+          
+        } catch (e) {
+          document.getElementById('pages-list').innerHTML = `
+            <div style="text-align:center;padding:40px;color:#ef4444;">
+              <i class="fas fa-exclamation-triangle" style="font-size:2rem;margin-bottom:16px;"></i>
+              <p>Fout bij laden: ${e.message}</p>
+            </div>
+          `;
+        }
+      }
+    })();
+  </script>
 </body>
 </html>
 

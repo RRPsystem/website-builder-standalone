@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inloggen - Standalone Builder</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .login-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+    }
+    .login-header {
+      background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+      color: white;
+      padding: 32px;
+      text-align: center;
+    }
+    .login-header h1 {
+      font-size: 1.75rem;
+      margin-bottom: 8px;
+    }
+    .login-header p {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+    .login-body {
+      padding: 32px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #374151;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    .btn {
+      width: 100%;
+      padding: 14px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      margin-top: 12px;
+    }
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+    .error-message {
+      background: #fef2f2;
+      border: 1px solid #fecaca;
+      color: #dc2626;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .error-message.show {
+      display: block;
+    }
+    .success-message {
+      background: #f0fdf4;
+      border: 1px solid #bbf7d0;
+      color: #16a34a;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+    .success-message.show {
+      display: block;
+    }
+    .tabs {
+      display: flex;
+      border-bottom: 2px solid #e5e7eb;
+      margin-bottom: 24px;
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      font-weight: 600;
+      color: #6b7280;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+    }
+    .tab:hover {
+      color: #374151;
+    }
+    .tab.active {
+      color: #667eea;
+      border-bottom-color: #667eea;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .forgot-password {
+      text-align: center;
+      margin-top: 16px;
+    }
+    .forgot-password a {
+      color: #667eea;
+      text-decoration: none;
+      font-size: 0.9rem;
+    }
+    .forgot-password a:hover {
+      text-decoration: underline;
+    }
+    .divider {
+      display: flex;
+      align-items: center;
+      margin: 24px 0;
+      color: #9ca3af;
+      font-size: 0.875rem;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #e5e7eb;
+    }
+    .divider span {
+      padding: 0 16px;
+    }
+    .guest-link {
+      text-align: center;
+      padding: 16px;
+      background: #f9fafb;
+      border-top: 1px solid #e5e7eb;
+    }
+    .guest-link a {
+      color: #6b7280;
+      text-decoration: none;
+    }
+    .guest-link a:hover {
+      color: #374151;
+    }
+    .loading {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-radius: 50%;
+      border-top-color: white;
+      animation: spin 0.8s linear infinite;
+      margin-right: 8px;
+      vertical-align: middle;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <div class="login-header">
+      <h1><i class="fas fa-globe"></i> Standalone Builder</h1>
+      <p>Log in om je pagina's op te slaan</p>
+    </div>
+    
+    <div class="login-body">
+      <div class="tabs">
+        <div class="tab active" data-tab="login">Inloggen</div>
+        <div class="tab" data-tab="register">Registreren</div>
+      </div>
+      
+      <div id="error-message" class="error-message"></div>
+      <div id="success-message" class="success-message"></div>
+      
+      <!-- Login Form -->
+      <div id="login-tab" class="tab-content active">
+        <form id="login-form">
+          <div class="form-group">
+            <label for="login-email">E-mailadres</label>
+            <input type="email" id="login-email" placeholder="jouw@email.nl" required>
+          </div>
+          <div class="form-group">
+            <label for="login-password">Wachtwoord</label>
+            <input type="password" id="login-password" placeholder="••••••••" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="login-btn">
+            <i class="fas fa-sign-in-alt"></i> Inloggen
+          </button>
+        </form>
+        <div class="forgot-password">
+          <a href="#" id="forgot-link">Wachtwoord vergeten?</a>
+        </div>
+      </div>
+      
+      <!-- Register Form -->
+      <div id="register-tab" class="tab-content">
+        <form id="register-form">
+          <div class="form-group">
+            <label for="register-email">E-mailadres</label>
+            <input type="email" id="register-email" placeholder="jouw@email.nl" required>
+          </div>
+          <div class="form-group">
+            <label for="register-password">Wachtwoord</label>
+            <input type="password" id="register-password" placeholder="Min. 6 karakters" minlength="6" required>
+          </div>
+          <div class="form-group">
+            <label for="register-password2">Bevestig wachtwoord</label>
+            <input type="password" id="register-password2" placeholder="Herhaal wachtwoord" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="register-btn">
+            <i class="fas fa-user-plus"></i> Account aanmaken
+          </button>
+        </form>
+      </div>
+      
+      <!-- Forgot Password Form (hidden by default) -->
+      <div id="forgot-tab" class="tab-content">
+        <form id="forgot-form">
+          <p style="margin-bottom: 16px; color: #6b7280;">
+            Voer je e-mailadres in en we sturen je een link om je wachtwoord te resetten.
+          </p>
+          <div class="form-group">
+            <label for="forgot-email">E-mailadres</label>
+            <input type="email" id="forgot-email" placeholder="jouw@email.nl" required>
+          </div>
+          <button type="submit" class="btn btn-primary" id="forgot-btn">
+            <i class="fas fa-envelope"></i> Reset link versturen
+          </button>
+          <button type="button" class="btn btn-secondary" id="back-to-login">
+            <i class="fas fa-arrow-left"></i> Terug naar inloggen
+          </button>
+        </form>
+      </div>
+    </div>
+    
+    <div class="guest-link">
+      <a href="index.html"><i class="fas fa-arrow-left"></i> Doorgaan zonder account (beperkte functies)</a>
+    </div>
+  </div>
+
+  <!-- Supabase JS -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script>
+    // Configuration - will be set by Vercel environment
+    const SUPABASE_URL = 'https://huaaogdxxdcakxryecnw.supabase.co';
+    const SUPABASE_ANON_KEY = window.STANDALONE_SUPABASE_ANON_KEY || '';
+    
+    let supabase = null;
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Try to get config from API
+      try {
+        const res = await fetch('/api/config');
+        if (res.ok) {
+          const config = await res.json();
+          if (config.SUPABASE_ANON_KEY) {
+            window.STANDALONE_SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+          }
+        }
+      } catch (e) {
+        console.warn('Could not fetch config:', e);
+      }
+      
+      const anonKey = window.STANDALONE_SUPABASE_ANON_KEY;
+      if (anonKey) {
+        supabase = window.supabase.createClient(SUPABASE_URL, anonKey);
+        
+        // Check if already logged in
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          // Redirect to builder
+          window.location.href = 'builder.html';
+          return;
+        }
+      } else {
+        showError('Configuratie niet geladen. Probeer de pagina te verversen.');
+      }
+      
+      setupTabs();
+      setupForms();
+    });
+    
+    function setupTabs() {
+      const tabs = document.querySelectorAll('.tab');
+      tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          const tabId = tab.dataset.tab;
+          
+          // Update tab styles
+          tabs.forEach(t => t.classList.remove('active'));
+          tab.classList.add('active');
+          
+          // Show correct content
+          document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+          document.getElementById(tabId + '-tab').classList.add('active');
+          
+          // Clear messages
+          hideMessages();
+        });
+      });
+      
+      // Forgot password link
+      document.getElementById('forgot-link').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('forgot-tab').classList.add('active');
+      });
+      
+      // Back to login
+      document.getElementById('back-to-login').addEventListener('click', () => {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('login-tab').classList.add('active');
+        document.querySelector('[data-tab="login"]').classList.add('active');
+      });
+    }
+    
+    function setupForms() {
+      // Login form
+      document.getElementById('login-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!supabase) {
+          showError('Supabase niet geconfigureerd');
+          return;
+        }
+        
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const btn = document.getElementById('login-btn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Bezig...';
+        hideMessages();
+        
+        try {
+          const { data, error } = await supabase.auth.signInWithPassword({
+            email,
+            password
+          });
+          
+          if (error) throw error;
+          
+          showSuccess('Ingelogd! Je wordt doorgestuurd...');
+          setTimeout(() => {
+            window.location.href = 'builder.html';
+          }, 1000);
+        } catch (err) {
+          showError(translateError(err.message));
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Inloggen';
+        }
+      });
+      
+      // Register form
+      document.getElementById('register-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!supabase) {
+          showError('Supabase niet geconfigureerd');
+          return;
+        }
+        
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const password2 = document.getElementById('register-password2').value;
+        const btn = document.getElementById('register-btn');
+        
+        if (password !== password2) {
+          showError('Wachtwoorden komen niet overeen');
+          return;
+        }
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Bezig...';
+        hideMessages();
+        
+        try {
+          const { data, error } = await supabase.auth.signUp({
+            email,
+            password
+          });
+          
+          if (error) throw error;
+          
+          if (data.user && !data.session) {
+            // Email confirmation required
+            showSuccess('Account aangemaakt! Check je e-mail om je account te bevestigen.');
+          } else {
+            showSuccess('Account aangemaakt! Je wordt doorgestuurd...');
+            setTimeout(() => {
+              window.location.href = 'builder.html';
+            }, 1000);
+          }
+        } catch (err) {
+          showError(translateError(err.message));
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-user-plus"></i> Account aanmaken';
+        }
+      });
+      
+      // Forgot password form
+      document.getElementById('forgot-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        if (!supabase) {
+          showError('Supabase niet geconfigureerd');
+          return;
+        }
+        
+        const email = document.getElementById('forgot-email').value;
+        const btn = document.getElementById('forgot-btn');
+        
+        btn.disabled = true;
+        btn.innerHTML = '<span class="loading"></span> Bezig...';
+        hideMessages();
+        
+        try {
+          const { error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + '/reset-password.html'
+          });
+          
+          if (error) throw error;
+          
+          showSuccess('Reset link verstuurd! Check je e-mail.');
+        } catch (err) {
+          showError(translateError(err.message));
+        } finally {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fas fa-envelope"></i> Reset link versturen';
+        }
+      });
+    }
+    
+    function showError(msg) {
+      const el = document.getElementById('error-message');
+      el.textContent = msg;
+      el.classList.add('show');
+      document.getElementById('success-message').classList.remove('show');
+    }
+    
+    function showSuccess(msg) {
+      const el = document.getElementById('success-message');
+      el.textContent = msg;
+      el.classList.add('show');
+      document.getElementById('error-message').classList.remove('show');
+    }
+    
+    function hideMessages() {
+      document.getElementById('error-message').classList.remove('show');
+      document.getElementById('success-message').classList.remove('show');
+    }
+    
+    function translateError(msg) {
+      const translations = {
+        'Invalid login credentials': 'Ongeldige inloggegevens',
+        'Email not confirmed': 'E-mail nog niet bevestigd',
+        'User already registered': 'Dit e-mailadres is al geregistreerd',
+        'Password should be at least 6 characters': 'Wachtwoord moet minimaal 6 karakters zijn',
+        'Unable to validate email address: invalid format': 'Ongeldig e-mailadres formaat'
+      };
+      return translations[msg] || msg;
+    }
+  </script>
+</body>
+</html>
