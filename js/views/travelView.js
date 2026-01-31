@@ -1782,32 +1782,34 @@
       // Convert itinerary (from days or itinerary array)
       let days = tcData.days || tcData.itinerary || tcData.dayToDay || [];
       
-      // If no days, create from destinations (expand by fromDay/toDay)
+      // If no days, create from destinations - GROUP consecutive days at same destination
       if (days.length === 0 && tcData.destinations && tcData.destinations.length > 0) {
-        console.log('[TravelView] No days found, creating from destinations');
+        console.log('[TravelView] No days found, creating GROUPED days from destinations');
         days = [];
         
         tcData.destinations.forEach(dest => {
           const fromDay = dest.fromDay || 1;
           const toDay = dest.toDay || fromDay;
-          const numDays = toDay - fromDay + 1;
           const destName = pickText(dest.name) || dest.name || 'Bestemming';
+          const destImgsRaw = dest.imageUrls || dest.images || [];
+          const destImgs = (Array.isArray(destImgsRaw) ? destImgsRaw : [])
+            .map(img => img && typeof img === 'object' ? (img.url || img.src || '') : img)
+            .filter(Boolean);
           
-          // Create a day entry for each day in this destination
-          for (let i = 0; i < numDays; i++) {
-            const dayNum = fromDay + i;
-            const destImgsRaw = dest.imageUrls || dest.images || [];
-            const destImgs = (Array.isArray(destImgsRaw) ? destImgsRaw : [])
-              .map(img => img && typeof img === 'object' ? (img.url || img.src || '') : img)
-              .filter(Boolean);
-            days.push({
-              title: `Dag ${dayNum}: ${destName}`,
-              description: i === 0 ? (pickText(dest.description) || `Bezoek aan ${destName}`) : `Vervolg in ${destName}`,
-              image: (destImgs.length ? destImgs[i % destImgs.length] : '') || dest.image || dest.imageUrl || '',
-              images: destImgs,
-              destination: destName
-            });
-          }
+          // Create ONE grouped entry per destination (e.g., "Dag 1-3: Kitzbühel")
+          const dayLabel = fromDay === toDay 
+            ? `Dag ${fromDay}` 
+            : `Dag ${fromDay}-${toDay}`;
+          
+          days.push({
+            title: `${dayLabel}: ${destName}`,
+            description: pickText(dest.description) || `Verblijf in ${destName}`,
+            image: destImgs[0] || dest.image || dest.imageUrl || '',
+            images: destImgs,
+            destination: destName,
+            fromDay: fromDay,
+            toDay: toDay
+          });
         });
       }
       
