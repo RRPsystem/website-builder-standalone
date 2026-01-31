@@ -9284,14 +9284,24 @@ ComponentFactory.createRoadbook = function(options = {}) {
                                 if (Number.isNaN(idx)) idx = 0;
                                 idx = ((idx % n) + n) % n;
                                 wrap.dataset.wbSlideIdx = String(idx);
-                                imgEl.src = slidesNow[idx];
+                                // Add smooth fade transition
+                                imgEl.style.transition = 'opacity 0.5s ease-in-out';
+                                imgEl.style.opacity = '0';
+                                setTimeout(() => {
+                                    imgEl.src = slidesNow[idx];
+                                    imgEl.style.opacity = '1';
+                                }, 250);
                             } catch (e2) {}
                         };
                         setIdx(parseInt(wrap.dataset.wbSlideIdx || '0', 10) || 0);
 
                         const start = () => {
                             try {
-                                if (wrap._wbSlideTimer) return;
+                                // Stop any existing timer first to prevent flickering
+                                if (wrap._wbSlideTimer) {
+                                    clearInterval(wrap._wbSlideTimer);
+                                    wrap._wbSlideTimer = null;
+                                }
                                 wrap._wbSlideTimer = window.setInterval(() => {
                                     try {
                                         const slidesNow = Array.isArray(wrap._wbSlides) ? wrap._wbSlides : slides;
