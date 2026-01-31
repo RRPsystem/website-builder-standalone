@@ -9090,10 +9090,10 @@ ComponentFactory.createRoadbook = function(options = {}) {
                                             '<span class="editable" contenteditable="true">' + subtitle + '</span>' +
                                             '<p class="editable" contenteditable="true">' + description + '</p>' +
                                             '<ul>' +
-                                                '<li><i class="fas fa-map-marker-alt" data-wb-icon="fa-map-marker-alt" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Tourist Attraction:</h6><span class="editable" contenteditable="true">Bezienswaardigheden</span></li>' +
-                                                '<li><i class="fas fa-shopping-bag" data-wb-icon="fa-shopping-bag" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Best Buy:</h6><span class="editable" contenteditable="true">Lokale producten</span></li>' +
-                                                '<li><i class="fas fa-utensils" data-wb-icon="fa-utensils" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Food Speciality:</h6><span class="editable" contenteditable="true">Lokale gerechten</span></li>' +
-                                                '<li><i class="fas fa-hiking" data-wb-icon="fa-hiking" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Activity:</h6><span class="editable" contenteditable="true">Activiteiten</span></li>' +
+                                                '<li><i class="fas fa-map-marker-alt" data-wb-icon="fa-map-marker-alt" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Bezienswaardigheid</h6><span class="editable" contenteditable="true">Bezienswaardigheden</span></li>' +
+                                                '<li><i class="fas fa-shopping-bag" data-wb-icon="fa-shopping-bag" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Winkelen</h6><span class="editable" contenteditable="true">Lokale producten</span></li>' +
+                                                '<li><i class="fas fa-utensils" data-wb-icon="fa-utensils" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Restaurant</h6><span class="editable" contenteditable="true">Lokale gerechten</span></li>' +
+                                                '<li><i class="fas fa-hiking" data-wb-icon="fa-hiking" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Activiteit</h6><span class="editable" contenteditable="true">Activiteiten</span></li>' +
                                             '</ul>' +
                                             '<div class="delight"><i class="fas fa-hotel"></i><h6>HOTEL:</h6><span class="editable" contenteditable="true">' + delight + '</span></div>' +
                                         '</div>' +
@@ -9108,10 +9108,10 @@ ComponentFactory.createRoadbook = function(options = {}) {
                                             '<span class="editable" contenteditable="true">' + subtitle + '</span>' +
                                             '<p class="editable" contenteditable="true">' + description + '</p>' +
                                             '<ul>' +
-                                                '<li><i class="fas fa-map-marker-alt" data-wb-icon="fa-map-marker-alt" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Tourist Attraction:</h6><span class="editable" contenteditable="true">Bezienswaardigheden</span></li>' +
-                                                '<li><i class="fas fa-shopping-bag" data-wb-icon="fa-shopping-bag" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Best Buy:</h6><span class="editable" contenteditable="true">Lokale producten</span></li>' +
-                                                '<li><i class="fas fa-utensils" data-wb-icon="fa-utensils" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Food Speciality:</h6><span class="editable" contenteditable="true">Lokale gerechten</span></li>' +
-                                                '<li><i class="fas fa-hiking" data-wb-icon="fa-hiking" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Activity:</h6><span class="editable" contenteditable="true">Activiteiten</span></li>' +
+                                                '<li><i class="fas fa-map-marker-alt" data-wb-icon="fa-map-marker-alt" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Bezienswaardigheid</h6><span class="editable" contenteditable="true">Bezienswaardigheden</span></li>' +
+                                                '<li><i class="fas fa-shopping-bag" data-wb-icon="fa-shopping-bag" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Winkelen</h6><span class="editable" contenteditable="true">Lokale producten</span></li>' +
+                                                '<li><i class="fas fa-utensils" data-wb-icon="fa-utensils" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Restaurant</h6><span class="editable" contenteditable="true">Lokale gerechten</span></li>' +
+                                                '<li><i class="fas fa-hiking" data-wb-icon="fa-hiking" style="cursor:pointer;"></i><h6 class="editable" contenteditable="true">Activiteit</h6><span class="editable" contenteditable="true">Activiteiten</span></li>' +
                                             '</ul>' +
                                             '<div class="delight"><i class="fas fa-hotel"></i><h6>HOTEL:</h6><span class="editable" contenteditable="true">' + delight + '</span></div>' +
                                         '</div>' +
@@ -9276,7 +9276,7 @@ ComponentFactory.createRoadbook = function(options = {}) {
 
                         wrap._wbSlides = slides;
 
-                        const setIdx = (nextIdx) => {
+                        const setIdx = (nextIdx, animate = true) => {
                             try {
                                 const slidesNow = Array.isArray(wrap._wbSlides) ? wrap._wbSlides : slides;
                                 const n = slidesNow.length;
@@ -9284,16 +9284,23 @@ ComponentFactory.createRoadbook = function(options = {}) {
                                 if (Number.isNaN(idx)) idx = 0;
                                 idx = ((idx % n) + n) % n;
                                 wrap.dataset.wbSlideIdx = String(idx);
-                                // Add smooth fade transition
-                                imgEl.style.transition = 'opacity 0.5s ease-in-out';
-                                imgEl.style.opacity = '0';
-                                setTimeout(() => {
+                                
+                                if (animate && imgEl.src) {
+                                    // Add smooth fade transition for subsequent slides
+                                    imgEl.style.transition = 'opacity 0.5s ease-in-out';
+                                    imgEl.style.opacity = '0';
+                                    setTimeout(() => {
+                                        imgEl.src = slidesNow[idx];
+                                        imgEl.style.opacity = '1';
+                                    }, 250);
+                                } else {
+                                    // No animation for initial load
                                     imgEl.src = slidesNow[idx];
-                                    imgEl.style.opacity = '1';
-                                }, 250);
+                                }
                             } catch (e2) {}
                         };
-                        setIdx(parseInt(wrap.dataset.wbSlideIdx || '0', 10) || 0);
+                        // Initial load without animation
+                        setIdx(parseInt(wrap.dataset.wbSlideIdx || '0', 10) || 0, false);
 
                         const start = () => {
                             try {
