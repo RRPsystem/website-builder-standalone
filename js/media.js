@@ -329,8 +329,27 @@ class MediaPicker {
           });
         }
         const unsplashSearchBtn = unsplashPane ? unsplashPane.querySelector('.unsplash-search') : null;
-        if (unsplashSearchBtn) unsplashSearchBtn.addEventListener('click', () => runSearch(false));
+        console.log('[MediaPicker] Unsplash search button found:', !!unsplashSearchBtn);
+        if (unsplashSearchBtn) {
+          unsplashSearchBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('[MediaPicker] Unsplash search button clicked!');
+            runSearch(false);
+          });
+        }
         if (moreBtn) moreBtn.addEventListener('click', () => { currentPage += 1; runSearch(true); });
+        // Add Enter key handler for search input
+        const unsplashQueryInput = unsplashPane ? unsplashPane.querySelector('.unsplash-query') : null;
+        if (unsplashQueryInput) {
+          unsplashQueryInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              console.log('[MediaPicker] Enter pressed in Unsplash search');
+              runSearch(false);
+            }
+          });
+        }
         // Auto-focus search input when tab opens and run default search
         const unsplashTabBtn = tabs.find(b => b.getAttribute('data-tab')==='unsplash');
         if (unsplashTabBtn) unsplashTabBtn.addEventListener('click', () => {
